@@ -30,8 +30,14 @@ public class CoronaVirusDataService {
     public List<LocationStats> getAllStats() {
         return allStats;
     }
+    
+    private int totalReportedCasesInIndia = 0;
 
-    @PostConstruct
+    public int getTotalReportedCasesInIndia() {
+		return totalReportedCasesInIndia;
+	}
+
+	@PostConstruct
     @Scheduled(cron = "* * 1 * * *")
     public void fetchVirusData() throws IOException, InterruptedException {
         List<LocationStats> newStats = new ArrayList<>();
@@ -50,6 +56,9 @@ public class CoronaVirusDataService {
             int prevDayCases = Integer.parseInt(record.get(record.size() - 2));
             locationStat.setLatestTotalCases(latestCases);
             locationStat.setDiffFromPrevDay(latestCases - prevDayCases);
+            if(record.get("Country/Region").equalsIgnoreCase("India")) {
+            	this.totalReportedCasesInIndia = latestCases;
+            }
             //System.out.println(locationStat);
             newStats.add(locationStat);
         }
